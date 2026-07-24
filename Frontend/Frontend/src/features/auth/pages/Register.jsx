@@ -29,8 +29,8 @@ export const Register = () => {
 
     try {
       // TODO: Connect to your backend API
-      console.log('Register Data:', formData)
-      // const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
+      // console.log('Register Data:', formData)
+      // const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, {
       //   method: "POST",
       //   headers: {
       //     "Content-Type": "application/json",
