@@ -3,98 +3,80 @@ import jwt from "jsonwebtoken";
 import { sendEmail } from "../services/mail.services.js";
 
 export async function register(req, res) {
-  console.log("Register API hit");
-
-  const { username, email, password } = req.body;
-
-  // Check if user already exists
-  const existingUser = await userModel.findOne({
-    $or: [{ email }, { username }],
-  });
-
-  if (existingUser) {
-    return res.status(400).json({
-      success: false,
-      message: existingUser.email === email
-        ? 'User with this Email already registered'
-        : 'Username already taken',
-      err: "user already exist"
-    });
-  }
-
-  // Create new user
-  const newUser = await new userModel({
-    username,
-    email,
-    password,
-  });
-
-  const emailVerificationToken = jwt.sign({
-    email: email,
-
-  }, process.env.JWT_SECRET, { expiresIn: "7d" });
-
-
-
-
-  await newUser.save();
-  // Save user to database
-
-
-  // Generate JWT token
-  //     const token = jwt.sign(
-  //       { id: newUser._id, email: newUser.email },
-  //       process.env.JWT_SECRET || 'your-secret-key',
-  //       { expiresIn: '7d' }
-  //     );
-
   try {
-    await sendEmail({
+    console.log("Register API hit");
 
-      to: email,
-      subject: "Welcome to perplexity",
-      html: `
+    const { username, email, password } = req.body;
+
+    const existingUser = await userModel.findOne({
+      $or: [{ email }, { username }],
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message:
+          existingUser.email === email
+            ? "User with this Email already registered"
+            : "Username already taken",
+        err: "user already exist",
+      });
+    }
+
+    const newUser = new userModel({
+      username,
+      email,
+      password,
+    });
+
+    const emailVerificationToken = jwt.sign(
+      { email },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    await newUser.save();
+
+    try {
+      await sendEmail({
+        to: email,
+        subject: "Welcome to Perplexity",
+        html: `
 <p>Hi ${username}</p>
 
 <p>Thank you for registering at <strong>Perplexity</strong>.</p>
 
-<p>We are excited to see you.</p>
-
-<p>Please verify your email by clicking this link below:</p>
+<p>Please verify your email by clicking the link below:</p>
 
 <a href="http://localhost:3000/api/auth/verifyemail?token=${emailVerificationToken}">
 Verify Email
 </a>
+`,
+      });
 
-<p>Best regards,<br>
-The Perplexity Team</p>
-`
-    })
+      console.log("MAIL SENT SUCCESSFULLY");
+    } catch (error) {
+      console.log("MAIL ERROR:", error);
+    }
 
-    console.log("MAIL SENT SUCCESSFULLY");
-  } catch (error) {
-    console.log("MAIL ERROR:", error);
+    return res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      data: {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+      },
+    });
+  } catch (err) {
+    console.log("REGISTER ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      error: err.message,
+    });
   }
-
-  res.status(201).json({
-    success: true,
-    message: 'User registered successfully',
-    data: {
-      id: newUser._id,
-      username: newUser.username,
-      email: newUser.email,
-    },
-  });
-  //   } catch (error) {
-  //     console.error('Registration error:', error);
-  //     res.status(500).json({
-  //       success: false,
-  //       message: 'An error occurred during registration',
-  //       error: error.message,
-  //     });
-  //   }
 }
-
 
 export async function verifyemail(req, res) {
 
@@ -172,7 +154,11 @@ export async function VerifyLogin(req, res) {
   }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
 
-  res.cookie("token", token)
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None"
+});
 
   res.status(200).json({
     message: "Login successfully",

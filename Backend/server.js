@@ -5,7 +5,7 @@ import http from "http"
 import { initSocket } from "./src/socket/socket.Server.js";
 
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT ;
 
 const httpServer=http.createServer(app)
 
