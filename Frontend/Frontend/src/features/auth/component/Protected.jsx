@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Navigate } from 'react-router'
+import { Navigate } from 'react-router-dom'
 
 export const Protected = ({children}) => {
     const user=useSelector(state=>state.auth.user)
@@ -8,10 +8,11 @@ export const Protected = ({children}) => {
 
     if(loading){
         return <div>Loading...</div>
-    }if(!user){
+    }
+    if(!user){
         return <Navigate to="/login" replace />
     }
 
     return children;
  
-}
+};
