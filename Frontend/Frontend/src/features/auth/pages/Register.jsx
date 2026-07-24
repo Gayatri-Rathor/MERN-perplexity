@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { register } from "../api/auth.api"; // path apne project ke hisab se
+import { register } from "../services/api.auth.js"; // path apne project ke hisab se
 
 export const Register = () => {
   const [formData, setFormData] = useState({
