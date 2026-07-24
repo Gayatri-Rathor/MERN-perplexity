@@ -21,7 +21,8 @@ app.use(cookieParser());
 
 app.use(morgan("dev"))
 app.use(cors({
-  origin: ["https://mern-perplexity-kohl.vercel.app",
+  origin: ["mern-perplexity-qgag6howt-bug-buster2.vercel.app",
+    "https://mern-perplexity-kohl.vercel.app",
     "http://localhost:5173"],
   credentials: true,
   methods: ["GET", "POST", "DELETE", "PUT"]
