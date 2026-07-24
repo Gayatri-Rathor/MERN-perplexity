@@ -20,13 +20,23 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(morgan("dev"))
+
 app.use(cors({
-  origin: ["mern-perplexity-qgag6howt-bug-buster2.vercel.app",
-    "https://mern-perplexity-kohl.vercel.app",
-    "http://localhost:5173"],
+  origin: (origin, callback) => {
+    if (
+      !origin ||
+      origin.includes("vercel.app") ||
+      origin === "http://localhost:5173"
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
   methods: ["GET", "POST", "DELETE", "PUT"]
-}))
+}));
+
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
