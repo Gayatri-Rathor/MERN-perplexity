@@ -21,9 +21,12 @@ app.use(cookieParser());
 
 app.use(morgan("dev"))
 app.use(cors({
-  origin:["https://mern-perplexity-kohl.vercel.app,http://localhost:5173"],
-  credentials:true,
-  methods:["GET","POST","DELETE","PUT"]
+  origin: ["https://mern-perplexity-kohl.vercel.app",
+    "http://localhost:5173"],
+  credentials: true,git add .
+git commit -m "Fix CORS origin"
+git push
+  methods: ["GET", "POST", "DELETE", "PUT"]
 }))
 app.use(express.urlencoded({ extended: true }));
 
@@ -38,6 +41,6 @@ app.get("/health", (req, res) => {
 // Mount auth routes
 app.use("/api/auth", authRouter);
 
-app.use("/api/chats",chatRouter);
+app.use("/api/chats", chatRouter);
 
 export { app };
