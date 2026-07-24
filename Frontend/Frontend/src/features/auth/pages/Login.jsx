@@ -1,8 +1,14 @@
 import React, { useState } from 'react'
-import {Link,useNavigate } from 'react-router'
 import { useAuth } from '../hook/UseAuth'
 import { useSelector } from 'react-redux'
-import { Navigate } from 'react-router'
+import {
+  Link,
+  Navigate,
+  useNavigate,
+  createBrowserRouter,
+  RouterProvider
+} from "react-router-dom";
+import { login } from '../services/api.auth';
 
 
 export const Login = () => {
@@ -14,14 +20,14 @@ export const Login = () => {
 
   let [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [focusedInput, setFocusedInput] = useState(null)    
+  const [focusedInput, setFocusedInput] = useState(null)
 
-  const user=useSelector(state=>state.auth.user)
-loading=useSelector(state=>state.auth.loading)
+  const user = useSelector(state => state.auth.user)
+  loading = useSelector(state => state.auth.loading)
 
-  const {handleLogin}=useAuth()
+  const { handleLogin } = useAuth()
 
-  const navigate=useNavigate()
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -36,9 +42,9 @@ loading=useSelector(state=>state.auth.loading)
     setError('')
     setLoading(true)
 
-    const payload={
-        email:formData.email,
-        password:formData.password
+    const payload = {
+      email: formData.email,
+      password: formData.password
     }
 
     await handleLogin(payload)
@@ -50,13 +56,13 @@ loading=useSelector(state=>state.auth.loading)
       // Example: const response = await fetch('http://localhost:5000/api/auth/login', { ... })
       alert('Login attempted with:', formData.email)
     } catch (err) {
-      setError(err.message || 'Login failed')
+      setError( err.message || 'Login failed')
     } finally {
       setLoading(false)
     }
   }
 
-  if(!loading && user){
+  if (!loading && user) {
     return <Navigate to="/" replace />
   }
 
@@ -178,9 +184,13 @@ loading=useSelector(state=>state.auth.loading)
               </div>
               <div className="text-center text-sm text-gray-400">
                 Don't have an account?{' '}
-                <a href="/register" className="font-medium transition hover:opacity-80" style={{ color: primaryColor, textDecoration: 'none' }}>
+                <Link
+                  to="/register"
+                  className="font-medium transition hover:opacity-80"
+                  style={{ color: primaryColor, textDecoration: 'none' }}
+                >
                   Sign up here
-                </a>
+                </Link>
               </div>
             </div>
           </div>

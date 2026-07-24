@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { register } from "../api/auth.api"; // path apne project ke hisab se
 
 export const Register = () => {
   const [formData, setFormData] = useState({
@@ -28,19 +30,24 @@ export const Register = () => {
     try {
       // TODO: Connect to your backend API
       console.log('Register Data:', formData)
-      const response = await fetch("http://localhost:3000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      })
+      // const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(formData),
+      //   credentials:"include",
+      // })
 
-      const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed")
-      }
+
+      console.log("Register Data:", formData);
+
+      const data = await register({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      });
 
       console.log("Register Response:", data)
 
@@ -48,7 +55,7 @@ export const Register = () => {
       setFormData({ username: '', email: '', password: '' })
       alert('Registration successful! Please log in.')
     } catch (err) {
-      setError(err.message || 'Registration failed')
+      setError(err.response?.data?.message || err.message || 'Registration failed')
     } finally {
       setLoading(false)
     }
@@ -200,9 +207,9 @@ export const Register = () => {
             {/* Footer Links */}
             <div className="mt-6 text-center text-sm text-gray-400">
               Already have an account?{' '}
-              <a href="/login" className="font-medium transition hover:opacity-80" style={{ color: primaryColor, textDecoration: 'none' }}>
+              <Link to="/login" className="font-medium transition hover:opacity-80" style={{ color: primaryColor, textDecoration: 'none' }}>
                 Sign in here
-              </a>
+              </Link>
             </div>
           </div>
         </div>

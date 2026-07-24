@@ -13,7 +13,5 @@ export const Protected = ({children}) => {
     }
 
     return children;
-  return (
-    <div></div>
-  )
+ 
 }
