@@ -47,8 +47,7 @@ export async function register(req, res) {
 <p>Thank you for registering at <strong>Perplexity</strong>.</p>
 
 <p>Please verify your email by clicking the link below:</p>
-
-<a href="http://localhost:3000/api/auth/verifyemail?token=${emailVerificationToken}">
+<a href="https://mern-perplexity.onrender.com/api/auth/verifyemail?token=${emailVerificationToken}">
 Verify Email
 </a>
 `,
@@ -101,7 +100,7 @@ export async function verifyemail(req, res) {
 
     const html = `<h1>Email verified succesfully</h1>
       <p>Your email has been verified .You can now log in to your account</p>
-      <a href="http://localhost:5173/login">Go to Login</a>`
+      <a href="https://mern-perplexity-kohl.vercel.app/login">Go to Login</a>`
 
     return res.send(html);
   }
