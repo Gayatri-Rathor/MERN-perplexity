@@ -200,8 +200,8 @@ export async function logout(req, res) {
 
   res.clearCookie("token", {
     httpOnly: true,
-    secure: false,      // true in production with HTTPS
-    sameSite: "lax",
+    secure: true,      // true in production with HTTPS
+    sameSite: "None",
   });
 
   res.status(200).json({

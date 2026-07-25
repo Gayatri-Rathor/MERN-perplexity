@@ -47,9 +47,12 @@ export const Login = () => {
       password: formData.password
     }
 
-    await handleLogin(payload)
-    navigate("/")
-
+    try {
+  await handleLogin(payload);
+  navigate("/");
+} catch (err) {
+  setError(err.message || "Login failed");
+}
     try {
       // TODO: Connect to your backend API
       console.log('Login Data:', formData)

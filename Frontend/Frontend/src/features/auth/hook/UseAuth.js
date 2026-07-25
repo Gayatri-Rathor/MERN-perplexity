@@ -12,7 +12,7 @@ export function useAuth() {
             dispatch(setLoading(true))
             const data = await register({ email, username, password })
         } catch (error) {
-            dispatch(setError(error.reponse?.data?.message || "Registration Failed"))
+            dispatch(setError(error.response?.data?.message || "Registration Failed"))
         } finally {
             dispatch(setLoading(false))
         }
@@ -23,8 +23,11 @@ export function useAuth() {
             dispatch(setLoading(true))
             const data = await login({ email, password })
             dispatch(setUser(data.user))
+
+            const me = await getMe();
+            dispatch(setUser(me.user));
         } catch (error) {
-            dispatch(setError(error.reponse?.data?.message || "Login Failed"))
+            dispatch(setError(error.response?.data?.message || "Login Failed"))
         } finally {
             dispatch(setLoading(false))
         }
@@ -36,7 +39,7 @@ export function useAuth() {
             const data = await getMe()
             dispatch(setUser(data.user))
         } catch (error) {
-            dispatch(setError(error.reponse?.data?.message || "Failed to fetch data "))
+            dispatch(setError(error.response?.data?.message || "Failed to fetch data "))
         } finally {
             dispatch(setLoading(false))
         }
@@ -65,6 +68,6 @@ export function useAuth() {
 
 
     return {
-        handleRegister, handleLogin, handlegetMe,handleLogout
+        handleRegister, handleLogin, handlegetMe, handleLogout
     }
 }

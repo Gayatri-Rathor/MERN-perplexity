@@ -6,11 +6,8 @@
   function App() {
   
 
-    const auth=useAuth()
 
-    useEffect(()=>{
-      auth.handlegetMe()
-    }, [])
+
 
     return (
       <><RouterProvider router={router}/></>
