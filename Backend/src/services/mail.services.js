@@ -1,48 +1,31 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.GOOGLE_USER,
-    pass: process.env.GOOGLE_APP_PASSWORD,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-transporter
-  .verify()
-  .then(() => {
-    console.log("Email is ready for Transport to SMTP");
-  })
-  .catch((err) => {
-    console.log("Email transporter verification failed:", err);
-  });
-
-export async function sendEmail({ to, subject, html, text }) {
+export async function sendEmail({ to, subject, html }) {
   console.log("sendEmail called:", to);
 
   try {
-    const mailOptions = {
-      from: process.env.GOOGLE_USER,
-      to,
+    const { data, error } = await resend.emails.send({
+      from: "Perplexity <onboarding@resend.dev>",
+      to: [to],
       subject,
       html,
-      text,
-    };
+    });
 
-    const details = await transporter.sendMail(mailOptions);
+    if (error) {
+      console.log("Email sending failed:", error);
+      throw new Error(error.message);
+    }
 
-    console.log("Email sent:", details.response);
+    console.log("Email sent successfully:", data);
 
-    return details;
+    return data;
   } catch (error) {
     console.log("Email sending failed:", error);
-
-    // VERY IMPORTANT
     throw error;
   }
 }
