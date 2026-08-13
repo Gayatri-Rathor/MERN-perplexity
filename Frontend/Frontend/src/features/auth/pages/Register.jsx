@@ -88,7 +88,7 @@ export const Register = () => {
             {/* Success Message */}
             {success && (
               <div className="mb-4 p-3 bg-green-900/30 border border-green-600 rounded-lg text-green-400 text-sm">
-                Account created successfully!
+                Verification email sent!
               </div>
             )}
 

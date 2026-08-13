@@ -74,42 +74,7 @@ export async function register(req, res) {
   }
 }
 
-// export async function verifyemail(req, res) {
 
-//   const { token } = req.query;
-
-//   try {
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-//     const user = await userModel.findOne({ email: decoded.email })
-
-//     if (!user) {
-//       return res.status(400).json({
-//         message: "Invalid Token",
-//         success: false,
-//         err: "user not found"
-//       })
-//     }
-
-//     user.verified = true;
-
-//     await user.save();
-
-//     const html = `<h1>Email verified succesfully</h1>
-//       <p>Your email has been verified .You can now log in to your account</p>
-//       <a href="https://mern-perplexity-kohl.vercel.app/login">Go to Login</a>`
-
-//     return res.send(html);
-//   }
-//   catch (err) {
-//     return res.status(400).json({
-//       message: "Invalid token",
-//       success: false,
-//       err: err.message
-//     })
-
-//   }
-// }
 
 export async function verifyemail(req, res) {
   const { token } = req.query;
