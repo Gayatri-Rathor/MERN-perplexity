@@ -19,98 +19,147 @@ export async function register(req, res) {
           existingUser.email === email
             ? "User with this Email already registered"
             : "Username already taken",
-        err: "user already exist",
       });
     }
 
-    const newUser = new userModel({
-      username,
-      email,
-      password,
-    });
-
+    // Create verification token containing user details
     const emailVerificationToken = jwt.sign(
-      { email },
+      {
+        username,
+        email,
+        password,
+      },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "15m" }
     );
 
-    await newUser.save();
+    // Send verification email FIRST
+    await sendEmail({
+      to: email,
+      subject: "Verify your Perplexity account",
+      html: `
+        <h2>Hi ${username}</h2>
 
-    try {
-      await sendEmail({
-        to: email,
-        subject: "Welcome to Perplexity",
-        html: `
-<p>Hi ${username}</p>
+        <p>Thank you for registering at <strong>Perplexity</strong>.</p>
 
-<p>Thank you for registering at <strong>Perplexity</strong>.</p>
+        <p>Please verify your email by clicking the button below:</p>
 
-<p>Please verify your email by clicking the link below:</p>
-<a href="https://mern-perplexity.onrender.com/api/auth/verifyemail?token=${emailVerificationToken}">
-Verify Email
-</a>
-`,
-      });
+        <a href="https://mern-perplexity.onrender.com/api/auth/verifyemail?token=${emailVerificationToken}">
+          Verify Email
+        </a>
 
-      console.log("MAIL SENT SUCCESSFULLY");
-    } catch (error) {
-      console.log("MAIL ERROR:", error);
-    }
-
-    return res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      data: {
-        id: newUser._id,
-        username: newUser.username,
-        email: newUser.email,
-      },
+        <p>This link will expire in 15 minutes.</p>
+      `,
     });
+
+    console.log("Verification email sent successfully");
+
+    // IMPORTANT:
+    // User is NOT saved to database here
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "Verification email sent. Please verify your email to complete registration.",
+    });
+
   } catch (err) {
     console.log("REGISTER ERROR:", err);
 
     return res.status(500).json({
       success: false,
+      message: "Unable to send verification email",
       error: err.message,
     });
   }
 }
 
-export async function verifyemail(req, res) {
+// export async function verifyemail(req, res) {
 
+//   const { token } = req.query;
+
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+//     const user = await userModel.findOne({ email: decoded.email })
+
+//     if (!user) {
+//       return res.status(400).json({
+//         message: "Invalid Token",
+//         success: false,
+//         err: "user not found"
+//       })
+//     }
+
+//     user.verified = true;
+
+//     await user.save();
+
+//     const html = `<h1>Email verified succesfully</h1>
+//       <p>Your email has been verified .You can now log in to your account</p>
+//       <a href="https://mern-perplexity-kohl.vercel.app/login">Go to Login</a>`
+
+//     return res.send(html);
+//   }
+//   catch (err) {
+//     return res.status(400).json({
+//       message: "Invalid token",
+//       success: false,
+//       err: err.message
+//     })
+
+//   }
+// }
+
+export async function verifyemail(req, res) {
   const { token } = req.query;
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await userModel.findOne({ email: decoded.email })
+    const existingUser = await userModel.findOne({
+      $or: [
+        { email: decoded.email },
+        { username: decoded.username }
+      ]
+    });
 
-    if (!user) {
-      return res.status(400).json({
-        message: "Invalid Token",
-        success: false,
-        err: "user not found"
-      })
+    if (existingUser) {
+      return res.status(400).send("User already registered.");
     }
 
-    user.verified = true;
+    // NOW create user in database
+    const newUser = new userModel({
+      username: decoded.username,
+      email: decoded.email,
+      password: decoded.password,
+      verified: true,
+    });
 
-    await user.save();
+    await newUser.save();
 
-    const html = `<h1>Email verified succesfully</h1>
-      <p>Your email has been verified .You can now log in to your account</p>
-      <a href="https://mern-perplexity-kohl.vercel.app/login">Go to Login</a>`
+    const html = `
+      <h1>Email Verified Successfully! 🎉</h1>
+
+      <p>Your email has been verified successfully.</p>
+
+      <p>Your account has now been created.</p>
+
+      <a href="https://mern-perplexity-kohl.vercel.app/login">
+        Go to Login
+      </a>
+    `;
 
     return res.send(html);
-  }
-  catch (err) {
-    return res.status(400).json({
-      message: "Invalid token",
-      success: false,
-      err: err.message
-    })
 
+  } catch (err) {
+    console.log("VERIFY ERROR:", err);
+
+    return res.status(400).json({
+      message: "Invalid or expired verification link",
+      success: false,
+      err: err.message,
+    });
   }
 }
 
