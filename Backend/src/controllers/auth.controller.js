@@ -30,7 +30,7 @@ export async function register(req, res) {
         password,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "1h" }
     );
 
     // Send verification email FIRST
