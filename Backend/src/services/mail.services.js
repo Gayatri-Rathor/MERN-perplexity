@@ -10,7 +10,7 @@ export async function sendEmail({ to, subject, html }) {
 
   const { data, error } = await resend.emails.send({
     from: "onboarding@resend.dev",
-    to: ["delivered@resend.dev"],
+    to: [to],
     subject,
     html,
   });
