@@ -2,6 +2,7 @@ import userModel from "../model/user.model.js";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../services/mail.services.js";
 
+
 export async function register(req, res) {
   try {
     console.log("Register API hit");
@@ -34,23 +35,36 @@ export async function register(req, res) {
     );
 
     // Send verification email FIRST
-    await sendEmail({
+    const verificationLink =
+      `https://mern-perplexity.onrender.com/api/auth/verifyemail?token=${emailVerificationToken}`;
+
+
+await sendEmail({
       to: email,
-      subject: "Verify your Perplexity account",
+      subject: "Verify your email",
       html: `
-        <h2>Hi ${username}</h2>
+        <h2>Verify your email</h2>
 
-        <p>Thank you for registering at <strong>Perplexity</strong>.</p>
+        <p>Hello ${username},</p>
 
-        <p>Please verify your email by clicking the button below:</p>
+        <p>Please click the button below to verify your email:</p>
 
-        <a href="https://mern-perplexity.onrender.com/api/auth/verifyemail?token=${emailVerificationToken}">
+        <a href="${verificationLink}"
+           style="
+             display:inline-block;
+             padding:10px 20px;
+             background:#000;
+             color:#fff;
+             text-decoration:none;
+             border-radius:5px;
+           ">
           Verify Email
         </a>
 
-        <p>This link will expire in 15 minutes.</p>
+        <p>This link will expire in 1 hour.</p>
       `,
     });
+
 
     console.log("Verification email sent successfully");
 
@@ -171,7 +185,7 @@ export async function VerifyLogin(req, res) {
     httpOnly: true,
     secure: true,
     sameSite: "None"
-});
+  });
 
   res.status(200).json({
     message: "Login successfully",
