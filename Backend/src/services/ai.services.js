@@ -29,7 +29,8 @@ const searchInternetTool = tool(searchInternet,
 
 const agent = createAgent({
     model: geminiModel,
-    tool: [searchInternetTool]
+    tools: [searchInternetTool],
+    systemPrompt: "You are a helpful assistant. For news, current events, or any recent information, always use the searchInternet tool before answering."
 })
 
 // export async function generateResponse(messages,image) {
