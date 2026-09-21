@@ -6,7 +6,7 @@ import { searchInternet } from "./internet.services.js";
 import { sendMessage } from "../controllers/chat.controller.js";
 
 
-const geminiModel = new ChatGoogleGenerativeAI({
+const geminiModel = new ChatGoogleGenerativeAI({    
     model: "gemini-3.1-flash-lite",
     apiKey: process.env.GEMINI_API
 });
@@ -51,6 +51,8 @@ const agent = createAgent({
 
 export async function generateResponse(messages, image) {
 
+      console.log("GEMINI START");
+
     const chatMessages = messages.map((msg, index) => {
 
         if (msg.role === "user") {
@@ -86,11 +88,13 @@ export async function generateResponse(messages, image) {
     const response = await agent.invoke({
         messages: chatMessages
     });
+    console.log("GEMINI SUCCESS");
 
     return response.messages.at(-1).text;
 }
 
 export async function generateTitle(message) {
+    console.log("MISTRAL START");
 
     const response = await mistralModel.invoke([
         new SystemMessage(`
@@ -113,6 +117,7 @@ Use:
 
 
     ]);
+    console.log("MISTRAL SUCCESS");
     return response.text;
 
 
