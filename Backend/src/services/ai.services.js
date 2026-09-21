@@ -3,7 +3,7 @@ import { ChatMistralAI } from "@langchain/mistralai"
 import { AIMessage, HumanMessage, SystemMessage, tool, createAgent } from "langchain";
 import * as z from "zod";
 import { searchInternet } from "./internet.services.js";
-import { sendMessage } from "../controllers/chat.controller.js";
+// import { sendMessage } from "../controllers/chat.controller.js";
 
 
 const geminiModel = new ChatGoogleGenerativeAI({    
@@ -94,31 +94,23 @@ export async function generateResponse(messages, image) {
 }
 
 export async function generateTitle(message) {
-    console.log("MISTRAL START");
+    console.log("TITLE START");
 
-    const response = await mistralModel.invoke([
-        new SystemMessage(`
-Always answer using Markdown.
-
-Use:
-- Headings
-- Bullet points
-- Numbered lists
-- Tables whenever suitable
-- Code blocks for code
-
-            You are a helpful assistant that generates concise and descriptive title for that chat conservation.
-            
-            User will provide you with the first message of a chat conservation,and you will generate a title that captures the essence of the conservation within 2-4 words. The title should be clear ,relevant and engaging ,giving users a quick understanding of the chat's topic.`
-
-        ),
-
-        new HumanMessage(`Generate a title for a chat conservation based on the following firt message:"${message}"`)
-
-
-    ]);
-    console.log("MISTRAL SUCCESS");
-    return response.text;
+    try {
+        const response = await geminiModel.invoke([
+            new SystemMessage(
+                "You generate concise chat titles. Reply with a 2-4 word title only. No quotes, no markdown, no punctuation."
+            ),
+            new HumanMessage(`First message: "${message}"`)
+        ]);
+        return response.text.trim();
+    } catch (err) {
+        console.error("Title generation failed:", err.message);
+        return message.slice(0, 30);
+    }
+    
+    // console.log("MISTRAL SUCCESS");
+    // return response.text;
 
 
 
