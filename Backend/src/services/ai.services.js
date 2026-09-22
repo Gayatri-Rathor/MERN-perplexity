@@ -8,12 +8,15 @@ import { searchInternet } from "./internet.services.js";
 
 const geminiModel = new ChatGoogleGenerativeAI({    
     model: "gemini-3.1-flash-lite",
-    apiKey: process.env.GEMINI_API
+    apiKey: process.env.GEMINI_API,
+    maxRetries:1
 });
 
 const mistralModel = new ChatMistralAI({
     model: "mistral-small-latest",
-    apiKey: process.env.MISTRAL_API_KEY
+    apiKey: process.env.MISTRAL_API_KEY,
+    maxRetries:1
+
 })
 
 const searchInternetTool = tool(searchInternet,

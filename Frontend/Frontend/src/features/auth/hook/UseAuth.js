@@ -3,9 +3,11 @@ import { login, register, getMe } from "../services/api.auth";
 import { setUser, setLoading, setError } from "../auth.slice";
 import { logout } from "../services/api.auth.js";
 import { logout as logoutAction } from "../auth.slice.js";
+import { useNavigate } from "react-router-dom";
 
 export function useAuth() {
     const dispatch = useDispatch()
+    const navigate=useNavigate();
 
     async function handleRegister({ email, username, password }) {
         try {

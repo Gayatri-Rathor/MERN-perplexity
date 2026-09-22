@@ -7,56 +7,55 @@ import PDFDocument from "pdfkit";
 
 
 export async function sendMessage(req, res) {
+    try {
+        let { message, chatId } = req.body
 
-    console.log(req.file);
-    console.log(req.body);
+        if (chatId === "null" || chatId === "undefined") {
+            chatId = null;
+        }
 
-    const { message, chatId } = req.body
+        let title = null, chat = null;
 
-    if (chatId === "null" || chatId === "undefined") {
-        chatId = null;
-    }
+        if (!chatId) {
+            title = await generateTitle(message);
+            chat = await chatModel.create({
+                user: req.user.id,
+                title,
+            })
+        }
 
-    let title = null, chat = null;
+        const currentChatId = chatId || chat._id
 
-    if (!chatId) {
-        title = await generateTitle(message);
-        chat = await chatModel.create({
-            user: req.user.id,
-            title,
+        const Usermessage = await messageModel.create({
+            chat: currentChatId,
+            content: message,
+            role: "user"
         })
 
+        const messages = await messageModel.find({ chat: currentChatId })
+        const currentChat = await chatModel.findById(currentChatId);
+        const result = await generateResponse(messages, req.file);
+
+        const aimessage = await messageModel.create({
+            chat: currentChatId,
+            content: result,
+            role: "ai"
+        })
+
+        res.status(201).json({
+            aimessage: result,
+            title,
+            chat: currentChat,
+            aiMessage: aimessage,
+            usermessage: Usermessage
+        })
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: "Something went wrong. Please try again."
+        })
     }
-
-    const currentChatId = chatId || chat._id
-
-    const Usermessage = await messageModel.create({
-        chat: currentChatId,
-        content: message,
-        role: "user"
-
-    })
-    const messages = await messageModel.find({ chat: currentChatId })
-    const currentChat = await chatModel.findById(currentChatId);
-    const result = await generateResponse(messages, req.file);
-
-    console.log(messages);
-
-    const aimessage = await messageModel.create({
-        chat: currentChatId,
-        content: result,
-        role: "ai"
-    })
-
-
-    res.status(201).json({
-        aimessage: result,
-        title,
-        chat: currentChat,
-        aiMessage: aimessage,
-        usermessage: Usermessage
-    })
-
 }
 
 

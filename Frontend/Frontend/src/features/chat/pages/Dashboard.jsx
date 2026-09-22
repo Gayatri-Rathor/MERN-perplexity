@@ -69,8 +69,7 @@ export const Dashboard = () => {
         if (chatHook?.initializeSocketConnection)
             chatHook.initializeSocketConnection()
         chatHook.handleGetChats()
-        console.log(chats);
-        console.log(currentChatId);
+       
 
     }, []);
 
@@ -86,16 +85,15 @@ export const Dashboard = () => {
     }, [messages]);
 
     const handleSendMessages = (e) => {
-        // console.log(req.file);
-        // console.log(req.body);
+        
         e.preventDefault()
-        console.log("working");
+        
 
 
         if (!messageText.trim()) return
         if (chatHook?.handleSendMessages) {
-            console.log(messageText);
-            console.log(selectedImage);
+            // console.log(messageText);
+            // console.log(selectedImage);
             chatHook.handleSendMessages({
 
                 chatId: currentChatId,
@@ -118,20 +116,22 @@ export const Dashboard = () => {
         }
     };
 
+    const baseURL=`${import.meta.env.VITE_BACKEND_URL}`;
+
     const downloadPDF = async () => {
-        console.log("Download button clicked");
+        // console.log("Download button clicked");
 
         if (!currentChatId) {
             alert("Please open a chat first");
             return;
         }
 
-        const response = await fetch(
-            `http://localhost:3000/api/chats/download/${currentChatId}`,
+       try{ const response = await fetch(
+            `${baseURL}/api/chats/download/${currentChatId}`,
             {
                 credentials: "include"
-            }
-        );
+            });
+            if(!response.ok) throw new Error("Download Failed");
 
         const blob = await response.blob();
 
@@ -144,15 +144,17 @@ export const Dashboard = () => {
         a.click();
 
         window.URL.revokeObjectURL(url);
-
-
+       }
+       catch(err){
+        alert("Could not download PDF. Please try again.")
+       }
     };
 
 
     const handleFileSelect = (e) => {
         const file = e.target.files[0];
 
-        console.log(file);
+        // console.log(file);
 
         if (file) {
             setSelectedImage(file);
